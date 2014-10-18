@@ -2,7 +2,6 @@ package me.legitmodern.PermissionsAPI.Utils.SQL;
 
 import me.legitmodern.PermissionsAPI.Main;
 import me.legitmodern.PermissionsAPI.Objects.Group;
-import me.legitmodern.PermissionsAPI.Objects.PermissionGroup;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,12 +37,16 @@ public class DatabaseManager extends DatabaseConnection {
             this.getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS permissionDataP(uuid VARCHAR(255), groupname VARCHAR(255), selfpermissions LONGTEXT)");
             this.getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS permissionDataG(groupname VARCHAR(255), permissions LONGTEXT)");
 
-            for (PermissionGroup group : PermissionGroup.values()) {
-                ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='" + group.getName() + "';").executeQuery();
-                rs.next();
-                if (rs.getInt(1) == 0) {
-                    this.getConnection().createStatement().execute("INSERT INTO permissionDataG (groupname, permissions) VALUES('" + group.getName() + "', '')");
-                }
+            ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='default';").executeQuery();
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                this.getConnection().createStatement().execute("INSERT INTO permissionDataG (groupname, permissions) VALUES('default', '')");
+            }
+
+            ResultSet rs1 = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='Owner';").executeQuery();
+            rs1.next();
+            if (rs1.getInt(1) == 0) {
+                this.getConnection().createStatement().execute("INSERT INTO permissionDataG (groupname, permissions) VALUES('Owner', '')");
             }
 
             Main.getInstance().getLogger().log(Level.INFO, "Successfully connected to the PermissionsAPI database!");
@@ -104,7 +107,7 @@ public class DatabaseManager extends DatabaseConnection {
             ResultSet rs = this.getPreparedStatement("SELECT groupname FROM permissionDataP WHERE uuid='" + player.toString() + "';").executeQuery();
 
             if (rs.next()) {
-                return new Group(PermissionGroup.fromName(rs.getString(1)));
+                return new Group(rs.getString(1));
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -137,9 +140,9 @@ public class DatabaseManager extends DatabaseConnection {
      * @param group Name of group
      * @return PermissionsAPI for group
      */
-    public List<String> getGroupPermissions(PermissionGroup group) {
+    public List<String> getGroupPermissions(String group) {
         try {
-            ResultSet rs = this.getPreparedStatement("SELECT permissions FROM permissionDataG WHERE groupname='" + group.getName() + "';").executeQuery();
+            ResultSet rs = this.getPreparedStatement("SELECT permissions FROM permissionDataG WHERE groupname='" + group + "';").executeQuery();
 
             if (rs.next()) {
                 return rs.getString(1).contains(",") ? Arrays.asList(rs.getString(1).split(",")) : Arrays.asList(rs.getString(1));
@@ -155,13 +158,13 @@ public class DatabaseManager extends DatabaseConnection {
      *
      * @param group Name of group
      */
-    public void enterNewGroup(PermissionGroup group) {
+    public void enterNewGroup(String group) {
         try {
-            ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='" + group.getName() + "'").executeQuery();
+            ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='" + group + "'").executeQuery();
             rs.next();
 
             if (rs.getInt(1) != 1) {
-                this.getPreparedStatement("INSERT INTO permissionDataG (groupname, permissions) VALUES('" + group.getName() + "', '')").execute();
+                this.getPreparedStatement("INSERT INTO permissionDataG (groupname, permissions) VALUES('" + group + "', '')").execute();
             }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -174,9 +177,9 @@ public class DatabaseManager extends DatabaseConnection {
      * @param group Group to check
      * @return Does Group exist
      */
-    public boolean doesGroupExist(PermissionGroup group) {
+    public boolean doesGroupExist(String group) {
         try {
-            ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='" + group.getName() + "';").executeQuery();
+            ResultSet rs = this.getPreparedStatement("SELECT COUNT(*) FROM permissionDataG WHERE groupname='" + group + "';").executeQuery();
             rs.next();
 
             return rs.getInt(1) == 1;
@@ -192,12 +195,12 @@ public class DatabaseManager extends DatabaseConnection {
      * @param player Player to set group from
      * @param group  Group name to set
      */
-    public void setPlayerGroup(UUID player, PermissionGroup group) {
+    public void setPlayerGroup(UUID player, String group) {
         try {
             ResultSet rs = this.getPreparedStatement("SELECT groupname FROM permissionDataP WHERE uuid='" + player.toString() + "';").executeQuery();
 
             if (rs.next()) {
-                this.getPreparedStatement("UPDATE permissionDataP SET groupname='" + group.getName() + "' WHERE uuid='" + player.toString() + "';").execute();
+                this.getPreparedStatement("UPDATE permissionDataP SET groupname='" + group + "' WHERE uuid='" + player.toString() + "';").execute();
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();

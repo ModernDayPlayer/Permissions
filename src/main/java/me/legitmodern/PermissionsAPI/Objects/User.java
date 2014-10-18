@@ -47,8 +47,8 @@ public class User {
             }
         }
 
-        if (DatabaseManager.getInstance().getGroupPermissions(this.getGroup().getGroupType()) != null) {
-            for (String permission : DatabaseManager.getInstance().getGroupPermissions(getGroup().getGroupType())) {
+        if (DatabaseManager.getInstance().getGroupPermissions(this.getGroup().getName()) != null) {
+            for (String permission : DatabaseManager.getInstance().getGroupPermissions(getGroup().getName())) {
                 if (!(perms.containsKey(permission) || perms.containsKey("^" + permission))) {
                     perms.put(permission, !permission.startsWith("^"));
                 }

@@ -4,7 +4,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import me.legitmodern.PermissionsAPI.Main;
-import me.legitmodern.PermissionsAPI.Objects.PermissionGroup;
 import me.legitmodern.PermissionsAPI.Utils.Chat.MessageUtils;
 import me.legitmodern.PermissionsAPI.Utils.PermissionManager;
 import me.legitmodern.PermissionsAPI.Utils.SQL.DatabaseManager;
@@ -40,11 +39,11 @@ public class Commands {
             } else if (args.argsLength() == 2) {
                 if (args.getString(0).equalsIgnoreCase("addrank")) {
                     String group = args.getString(1);
-                    if (!DatabaseManager.getInstance().doesGroupExist(PermissionGroup.fromName(group))) {
-                        DatabaseManager.getInstance().enterNewGroup(PermissionGroup.fromName(group));
+                    if (!DatabaseManager.getInstance().doesGroupExist(group)) {
+                        DatabaseManager.getInstance().enterNewGroup(group);
                         MessageUtils.messagePrefix(player, "Added group &6" + group + "&7!");
                     } else {
-                        MessageUtils.messagePrefix(player, "That group already exists!");
+                        MessageUtils.messagePrefix(player, "&cThat group already exists!");
                     }
 
                     return;
@@ -55,8 +54,8 @@ public class Commands {
                     UUID targetUUID = UUIDUtility.getUUID(target);
                     if (DatabaseManager.getInstance().doesPlayerExist(targetUUID)) {
                         String group = args.getString(2);
-                        if (PermissionGroup.fromName(group) != null) {
-                            DatabaseManager.getInstance().setPlayerGroup(targetUUID, PermissionGroup.fromName(group));
+                        if (DatabaseManager.getInstance().doesGroupExist(group)) {
+                            DatabaseManager.getInstance().setPlayerGroup(targetUUID, group);
 
                             if (Bukkit.getPlayer(target) != null) {
                                 PermissionManager.permissionManagerMap.get(targetUUID.toString()).remove();

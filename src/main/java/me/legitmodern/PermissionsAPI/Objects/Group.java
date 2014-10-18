@@ -6,9 +6,9 @@ import java.util.List;
 
 public class Group {
 
-    private PermissionGroup group;
+    private String group;
 
-    public Group(PermissionGroup group) {
+    public Group(String group) {
         this.group = group;
     }
 
@@ -17,7 +17,7 @@ public class Group {
      *
      * @return Group Name
      */
-    public PermissionGroup getGroupType() {
+    public String getName() {
         return this.group;
     }
 
@@ -27,6 +27,6 @@ public class Group {
      * @return Group PermissionsAPI
      */
     public List<String> getPermissions() {
-        return DatabaseManager.getInstance().getGroupPermissions(getGroupType());
+        return DatabaseManager.getInstance().getGroupPermissions(getName());
     }
 }

@@ -1,7 +1,6 @@
 package me.legitmodern.PermissionsAPI.API;
 
 import me.legitmodern.PermissionsAPI.Objects.Group;
-import me.legitmodern.PermissionsAPI.Objects.PermissionGroup;
 import me.legitmodern.PermissionsAPI.Objects.User;
 
 import java.util.UUID;
@@ -25,7 +24,7 @@ public class PermissionsAPI {
      * @return Group
      */
     public static Group getGroup(String groupname) {
-        return new Group(PermissionGroup.fromName(groupname));
+        return new Group(groupname);
     }
 
 }
